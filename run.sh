@@ -1,0 +1,15 @@
+python experiments.py --model=simple-cnn \
+    --dataset=mnist \
+    --alg=fedkt \
+    --lr=0.01 \
+    --batch-size=32 \
+    --epochs=100 \
+    --stu_epochs=100 \
+    --n_parties=10 \
+    --partition=hetero-dir \
+    --n_partition=5 \
+    --n_teacher_each_partition=10\
+    --beta=0.5\
+    --device='cuda:0'\
+    --datadir='/hdd2/qinbin/data/mnist' \
+    --logdir='./logs/mnist/'
