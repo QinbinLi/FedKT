@@ -77,7 +77,7 @@ def get_args():
     parser.add_argument('--privacy_analysis_file_name', type=str, default=None, help='The file path to save the information for privacy analysis')
     parser.add_argument('--n_stu_trees', type=int, default=100, help='The number of trees in a student model')
     parser.add_argument('--is_same_initial', type=int, default=1, help='Whether initial all the models with the same parameters in fedavg')
-    parser.add_argument('--optimizer', type=str, default='sgd', help='sgd or adam optimizer')
+    parser.add_argument('--optimizer', type=str, default='adam', help='the optimizer')
     parser.add_argument('--vote_threshold', type=float, default=None, help='a voting threshold to filter the query')
     parser.add_argument('--local_training_epochs', type=int, default=None, help='the number of epochs for the local trainig alg')
     parser.add_argument('--dp_level', type=int, default=0, help='1 represents add dp on the server side. 2 represents add dp on the party side')
