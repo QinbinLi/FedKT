@@ -1,5 +1,5 @@
 # Model-Agnostic Round-Optimal Federated Learning via Knowledge Transfer
-This is the code for paper "Model-Agnostic Round-Optimal Federated Learning via Knowledge Transfer" [pdf](https://openreview.net/pdf?id=T0tmb7uhRhD).
+This is the code for paper "Model-Agnostic Round-Optimal Federated Learning via Knowledge Transfer" [[PDF]](https://openreview.net/pdf?id=T0tmb7uhRhD).
 
 ## Dependencies
 * PyTorch 1.6.0
