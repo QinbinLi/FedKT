@@ -1,0 +1,17 @@
+python experiments.py --model=simple-cnn \
+	--dataset=svhn \
+	--alg=fedkt \
+	--n_parties=10 \
+	--lr=0.001 \
+	--stu_lr=0.001 \
+	--batch-size=64 \
+	--epochs=100 \
+	--stu_epochs=100 \
+	--final_stu_epochs=100 \
+	--n_teacher_each_partition=5 \
+	--n_partition=2 \
+	--beta=0.5 \
+	--init_seed=0 \
+	--device='cuda:0' \
+	--datadir='./data/svhn/' \
+	--logdir='./logs/svhn/'

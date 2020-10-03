@@ -19,7 +19,7 @@ def init_trees(max_tree_depth, n_parties, n_local_models, task_type, args):
     trees = {tree_i: None for tree_i in range(n_total_trees)}
 
     for tree_i in range(n_total_trees):
-        if args.model == 'tree':
+        if args.model == 'tree' or args.model == 'gbdt_tree':
             if task_type == "binary_cls":
                 trees[tree_i] = tree.DecisionTreeClassifier(max_depth = max_tree_depth)
             elif task_type == "reg":
@@ -30,7 +30,7 @@ def init_trees(max_tree_depth, n_parties, n_local_models, task_type, args):
             trees[tree_i] = RandomForestClassifier(max_depth = args.max_tree_depth, n_estimators=args.n_stu_trees)
 
         elif args.model == 'gbdt':
-            trees[tree_i] = xgb.XGBClassifier(max_depth=args.max_tree_depth, learning_rate=args.lr, gamma=1, reg_lambda=1, tree_method='hist')
+            trees[tree_i] = xgb.XGBClassifier(max_depth=args.max_tree_depth, n_estimators = args.n_stu_trees, learning_rate=args.lr, gamma=1, reg_lambda=1, tree_method='hist')
         elif args.model == 'gbdt_ntree':
             trees[tree_i] = xgb.XGBClassifier(max_depth=args.max_tree_depth, n_estimators = args.n_stu_trees, learning_rate=args.lr, gamma=1,
                                               reg_lambda=1, tree_method='hist')
@@ -153,13 +153,30 @@ def central_train_trees_in_a_party(trees, args, X_train, y_train, X_test, y_test
     return trees
 
 
-def train_a_student_tree(trees, public_data, public_data_label, n_classes, stu_model, gamma, filter_query):
+def train_a_student_tree(trees, public_data, public_data_label, n_classes, stu_model, gamma, filter_query, threshold=None, n_partition=None, apply_consistency=False, is_final_student=False):
     vote_counts = np.zeros((len(public_data_label), n_classes))
     for tree_id, tree in enumerate(trees):
         y_pred = tree.predict(public_data)
+        y_prob = tree.predict_proba(public_data)
         # print("y_pred:", y_pred)
-        for i, y in enumerate(y_pred):
-            vote_counts[i][int(y)] += 1
+        if is_final_student and apply_consistency:
+            if tree_id % n_partition == 0:
+                votes_base = y_pred
+                votes_flag = np.ones(len(y_pred), dtype=int)
+            else:
+                for i,y in enumerate(y_pred):
+                    if votes_flag[i]:
+                        if int(y) != votes_base[i]:
+                            votes_flag[i] = 0
+                    if (tree_id % n_partition) == (n_partition - 1) and votes_flag[i]:
+                        vote_counts[i][int(y)] += n_partition
+        else:
+            for i, y in enumerate(y_pred):
+                if threshold is not None:
+                    if y_prob[i] >= threshold:
+                        vote_counts[i][int(y)] += 1
+                else:
+                    vote_counts[i][int(y)] += 1
     vote_counts_origin = copy.deepcopy(vote_counts).astype("int")
 
 
@@ -240,10 +257,5 @@ def fedboost(trees, args, net_dataidx_map, X_train, y_train, X_test, y_test, tas
         logger.info("In party %d" % party_id)
         logger.info("Selected trees %s" % " ".join(str(e) for e in ensemble_tree_ids))
         logger.info("Boost acc: %f" % ens_acc)
-
-
-
-
-
 
 

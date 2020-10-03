@@ -18,7 +18,7 @@ class FcNet(nn.Module):
     Fully connected network for MNIST classification
     """
 
-    def __init__(self, input_dim, hidden_dims, output_dim, dropout_p=0.0):
+    def __init__(self, input_dim, hidden_dims, output_dim, stdv=None, dropout_p=0.0):
 
         super().__init__()
 
@@ -40,13 +40,26 @@ class FcNet(nn.Module):
                 nn.Linear(ip_dim, op_dim, bias=True)
             )
 
-        self.__init_net_weights__()
+        self.__init_net_weights__(stdv)
 
-    def __init_net_weights__(self):
+    # def __init_net_weights__(self):
+    #
+    #     for m in self.layers:
+    #         m.weight.data.normal_(0.0, 0.1)
+    #         m.bias.data.fill_(0.1)
 
-        for m in self.layers:
-            m.weight.data.normal_(0.0, 0.1)
-            m.bias.data.fill_(0.1)
+    def __init_net_weights__(self, stdv):
+        if stdv == -1:
+            for m in self.layers:
+                m.weight.data.normal_(0.0, 0.1)
+                m.bias.data.fill_(0.1)
+        else:
+            for m in self.layers:
+                if stdv is None:
+                    stdv = 1. / math.sqrt(m.weight.size(1))
+                m.weight.data.uniform_(-stdv, stdv)
+                if m.bias is not None:
+                    m.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):
 
