@@ -49,7 +49,7 @@ def get_args():
                         help='number of local nets in a partitioning of a party')
     parser.add_argument('--alg', type=str, default='fedavg',
                             help='which type of communication strategy is going to be used: fedavg/fedkt/fedprox/simenb')
-    parser.add_argument('--comm_round', type=int, default=50,
+    parser.add_argument('--comm_round', type=int, default=1,
                             help='number of communication rounds')
     parser.add_argument('--trials', type=int, default=1, help="Number of trials for each run")
     parser.add_argument('--init_seed', type=int, default=0, help="Random seed")
